@@ -35,7 +35,7 @@ def start_gui(main_app):
             line.set_ydata(plotdata[:, column])
         return lines
 
-    fig = Figure(figsize=(17, 2), dpi=100)  # Adjust the size as needed
+    fig = Figure(figsize=(6, 2), dpi=100)  # Adjust the size as needed
     ax = fig.add_subplot()
     lines = ax.plot(plotdata)
     ax.legend(['channel {}'.format(c) for c in channels], loc='lower left', ncol=len(channels))
@@ -56,4 +56,4 @@ def start_gui(main_app):
     canvas_widget = canvas.get_tk_widget()
     canvas_widget.pack(fill='both', expand=True)
 
-    main_app.ani = FuncAnimation(fig, update_plot, interval=30, blit=False, cache_frame_data=False)
+    main_app.ani = FuncAnimation(fig, update_plot, interval=window/10, blit=False, cache_frame_data=False)

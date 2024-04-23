@@ -8,7 +8,8 @@ output_headphones = None
 forward_vb        = None
 data_loop         = []
 open_streams      = []
-sound_dtype       = 'float32'
+sound_dtype       = 'int16'
+sampling_freq     = None
 downsample        = 10
 q                 = queue.Queue(maxsize=20)
 
@@ -48,8 +49,6 @@ def __on_exit():
         stream.stop()
 
 
-
-
 def on_stream_operation(func):
     if any([output_vb, output_headphones, forward_vb]) is None:
         return
@@ -61,7 +60,7 @@ def on_stream_operation(func):
 
 def initialize():
     devices = sd.query_devices()
-    global output_vb, forward_vb, output_headphones, open_streams
+    global output_vb, forward_vb, output_headphones, open_streams, sampling_freq
     for device in devices:
         if device['name'] == 'CABLE Input (VB-Audio Virtual Cable)':
             output_vb = device
@@ -73,7 +72,8 @@ def initialize():
     loop_back_stream = sd.Stream(device=(forward_vb['index'], output_vb['index']), callback=loop_back,
                                  blocksize=16, latency='low', dtype=sound_dtype)
     play_stream      = sd.Stream(device=(forward_vb['index'], output_headphones['index']), callback=play,
-                                 blocksize=256, latency=0.25, dtype=sound_dtype)
+                                 blocksize=1024, latency=0.1, dtype=sound_dtype)
+    sampling_freq = output_headphones['default_samplerate']
     open_streams = [loop_back_stream, play_stream]
     loop_back_stream.start()
     play_stream.start()
