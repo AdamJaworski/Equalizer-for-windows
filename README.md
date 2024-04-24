@@ -3,6 +3,8 @@
 
 ![image](https://github.com/AdamJaworski/MicrophoneFilterApplication/assets/118479184/6cf997da-a6b2-447c-988f-28ab3585916e)
 
+![image](https://github.com/AdamJaworski/Equalizer-for-windows/assets/118479184/daba281c-2ce4-42e4-af86-9c4dde324f0e)
+
 ## How to use ## 
   In audio_stream_handler.py change name of devices to your virutal audio input/output and your headphones or speakers.
 ![image](https://github.com/AdamJaworski/MicrophoneFilterApplication/assets/118479184/fae63a09-6a62-431b-bf99-748d3eb5386f)
