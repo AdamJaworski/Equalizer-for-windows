@@ -4,27 +4,25 @@ import queue
 from matplotlib.animation import FuncAnimation
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import global_variables
 
 
 plotdata = None
 
 
-def start_gui(main_app):
+def start_gui(main_app, audio_stream_handler):
     global plotdata
     window = 300  # time in ms
-    downsample = 10
-    channels = [*range(global_variables.forward_vb['max_input_channels'])]
-    sample_rate = global_variables.forward_vb['default_samplerate']
-    length = int(window * sample_rate / (1000 * downsample))
+    channels = [*range(audio_stream_handler.forward_vb['max_input_channels'])]
+    sample_rate = audio_stream_handler.forward_vb['default_samplerate']
+    length = int(window * sample_rate / (1000 * audio_stream_handler.downsample))
     mapping = [c - 1 for c in channels]
     plotdata = np.zeros((length, len(channels)))
 
     def update_plot(frame):
         global plotdata
-        while not global_variables.q.empty():
+        while not audio_stream_handler.queue.empty():
             try:
-                data = global_variables.q.get_nowait()
+                data = audio_stream_handler.queue.get_nowait()
             except queue.Empty:
                 break
             shift = len(data)
@@ -56,4 +54,4 @@ def start_gui(main_app):
     canvas_widget = canvas.get_tk_widget()
     canvas_widget.pack(fill='both', expand=True)
 
-    main_app.ani = FuncAnimation(fig, update_plot, interval=window/10, blit=False, cache_frame_data=False)
+    main_app.ani = FuncAnimation(fig, update_plot, interval=window/30, blit=False, cache_frame_data=False)

@@ -1,19 +1,25 @@
 from numba import jit, prange
 import customtkinter
-import global_variables
-from scipy.signal import butter, sosfilt
+from scipy.signal import butter, bessel, sosfilt_zi, sosfilt
 import numpy as np
 
 
-def start_gui(main_app):
+def start_gui(main_app, audio_stream_handler):
     equalizer_bool = False
 
-    freqs = [63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]
+    freqs     = [16, 31.5, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]
+    low_band  = [11, 22, 44, 88, 177, 355, 710, 1420, 2840, 5680, 11360]
+    high_band = [22, 44, 88, 177, 355, 710, 1420, 2840, 5680, 11360, 20000]
     sliders, freq_labels, gain_labels = [], [], []
-    sos_cache = [butter(4, [11 * (2 ** (i + 2)), 11 * (2 ** (i + 3))], fs=global_variables.sampling_freq, btype='band', output='sos') for i in range(len(freqs))]
+    sos_cache = [butter(8, np.array([low_band[i], high_band[i]]) / (audio_stream_handler.sampling_freq / 2), btype='band', output='sos') for i in range(len(freqs))]
+    zi_left  = [sosfilt_zi(sos) * 0 for sos in sos_cache]
+    zi_right = [sosfilt_zi(sos) * 0 for sos in sos_cache]
 
-    def bandpass_filter(data, sos):
-        return np.array([sosfilt(sos, data[:, channel]) for channel in range(data.shape[1])]).T
+    def bandpass_filter(data, index):
+        nonlocal zi_right, zi_left
+        left, zi_left[index]   = sosfilt(sos_cache[index], data[:, 0], zi=zi_left[index])
+        right, zi_right[index] = sosfilt(sos_cache[index], data[:, 1], zi=zi_right[index])
+        return np.column_stack((left, right))
 
     def dB_to_linear(gain_dB):
         return 10 ** (gain_dB / 20)
@@ -26,16 +32,16 @@ def start_gui(main_app):
         return result
 
     def equalizer(data):
-        filters = [bandpass_filter(data, sos) for sos in sos_cache]
+        filters = [bandpass_filter(data, index) for index in range(len(sos_cache))]
         gains = [dB_to_linear(sliders[index].get() + 1) for index in range(len(sliders))]
-        return apply_gain_and_sum(filters, gains)
+        data = apply_gain_and_sum(filters, gains)
+        return data
 
-    @global_variables.on_stream_operation
     def change_state(*args):
         nonlocal equalizer_bool
         equalizer_bool = not equalizer_bool
         button.configure(fg_color='#126929' if equalizer_bool else '#1F6AA5')
-        (global_variables.data_loop.append if equalizer_bool else global_variables.data_loop.remove)(equalizer)
+        (audio_stream_handler.data_loop.append if equalizer_bool else audio_stream_handler.data_loop.remove)(equalizer)
 
     def update_label(*args):
         for index, label in enumerate(gain_labels):

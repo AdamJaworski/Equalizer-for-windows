@@ -1,28 +1,26 @@
 import customtkinter
-import global_variables
-
-use_volume_filter = False
 
 
-def start_gui(main_app):
+def start_gui(main_app, audio_stream_handler):
+    use_volume_filter = False
+
     def volume_filter(data):
         return data * (10 ** (volume_slider.get() / 20))
 
     def update_label(*args):
         silder_vaule_label.configure(text=f'{(volume_slider.get()):.1f} dB')
 
-    @global_variables.on_stream_operation
     def change_state_volume(*args):
-        global use_volume_filter
+        nonlocal use_volume_filter
         use_volume_filter = not use_volume_filter
 
         if use_volume_filter:
             volume_filter_button.configure(fg_color='#126929')
-            global_variables.data_loop.append(volume_filter)
+            audio_stream_handler.data_loop.append(volume_filter)
 
         else:
             volume_filter_button.configure(fg_color='#1F6AA5')
-            global_variables.data_loop.remove(volume_filter)
+            audio_stream_handler.data_loop.remove(volume_filter)
 
     volume_frame = customtkinter.CTkFrame(main_app, height=300, width=100)
     volume_frame.pack(anchor='s',  side='left')
