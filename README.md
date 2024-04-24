@@ -7,7 +7,8 @@
 
 ## How to use ## 
   In audio_stream_handler.py change name of devices to your virutal audio input/output and your headphones or speakers.
-![image](https://github.com/AdamJaworski/MicrophoneFilterApplication/assets/118479184/fae63a09-6a62-431b-bf99-748d3eb5386f)
+  
+  ![image](https://github.com/AdamJaworski/MicrophoneFilterApplication/assets/118479184/fae63a09-6a62-431b-bf99-748d3eb5386f)
 
 
 ## Currently working on ##
