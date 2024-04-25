@@ -66,14 +66,15 @@ class AudioStreamHandler:
 
         self.sampling_freq = self.output_headphones['default_samplerate']
         loop_back_stream = sd.Stream(device=(self.forward_vb['index'], self.output_vb['index']),
-                                     callback=self.loop_back, blocksize=32, latency=0.05, clip_off=True)        #, never_drop_input=True, clip_off=False
+                                     callback=self.loop_back, blocksize=32, latency=0.01, clip_off=True)        #, never_drop_input=True, clip_off=False
 
         play_stream = sd.Stream(device=(self.forward_vb['index'], self.output_headphones['index']),
-                                callback=self.play, clip_off=True, blocksize=256, latency=0.05)
+                                callback=self.play, clip_off=True, blocksize=2048, latency=0.01)
 
         self.open_streams = [loop_back_stream, play_stream]
         loop_back_stream.start()
         play_stream.start()
+
 
     def __del__(self):
         self.on_exit()

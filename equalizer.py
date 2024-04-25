@@ -1,6 +1,6 @@
 from numba import jit, prange
 import customtkinter
-from scipy.signal import butter, bessel, sosfilt_zi, sosfilt
+from scipy.signal import butter, sosfilt_zi, sosfilt
 import numpy as np
 
 
@@ -76,7 +76,11 @@ def start_gui(main_app, audio_stream_handler):
         gain_labels.append(gain_label)
         gain_label.pack(side='bottom')
 
+    example_config = [3.7, -0.5, -2.9, 3.2, -4.4, 0.6, 0.8, 1.8, -1, 2.3, 0]
+    example_config = [3.7, -0.5, -2.9, 3.2, -4.4, 0.1, 0.5, -1.1, -1.7, 4.4, 4.6]
     button_frame = customtkinter.CTkFrame(equalizer_frame)
     button_frame.pack(side='left', fill='y', padx=(4, 0))
     button = customtkinter.CTkButton(button_frame, text='', width=30, height=30, command=change_state)
     button.pack(anchor='center', side='top', padx=20, pady=10)
+
+    apply_gain_and_sum([0], [0])
