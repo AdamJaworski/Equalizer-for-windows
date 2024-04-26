@@ -2,6 +2,8 @@ from numba import jit, prange
 import customtkinter
 from scipy.signal import butter, sosfilt_zi, sosfilt
 import numpy as np
+import json
+from tkinter import filedialog
 
 
 def start_gui(main_app, audio_stream_handler):
@@ -43,6 +45,25 @@ def start_gui(main_app, audio_stream_handler):
         button.configure(fg_color='#126929' if equalizer_bool else '#1F6AA5')
         (audio_stream_handler.data_loop.append if equalizer_bool else audio_stream_handler.data_loop.remove)(equalizer)
 
+    def load():
+        try:
+            open_ = open(filedialog.askopenfilename())
+        except Exception:
+            return
+
+        settings = json.load(open_)
+        for index, value in enumerate(settings["equalizer"]):
+            sliders[index].set(value)
+        update_label()
+
+    def save():
+        values = [slider.get() for slider in sliders]
+        preset = {"equalizer": values}
+        file = filedialog.asksaveasfile(defaultextension=".json", filetypes=(("JSON file", "*.json"), ("All Files", "*.*")))
+        if file is None:
+            return
+        json.dump(preset, file)
+
     def update_label(*args):
         for index, label in enumerate(gain_labels):
             label.configure(text=f'{(sliders[index].get()):.1f} dB')
@@ -80,7 +101,10 @@ def start_gui(main_app, audio_stream_handler):
     example_config = [3.7, -0.5, -2.9, 3.2, -4.4, 0.1, 0.5, -1.1, -1.7, 4.4, 4.6]
     button_frame = customtkinter.CTkFrame(equalizer_frame)
     button_frame.pack(side='left', fill='y', padx=(4, 0))
+
     button = customtkinter.CTkButton(button_frame, text='', width=30, height=30, command=change_state)
     button.pack(anchor='center', side='top', padx=20, pady=10)
+    customtkinter.CTkButton(button_frame, text='S', width=30, height=30, command=save).pack(anchor='center', padx=20, pady=(70, 10))
+    customtkinter.CTkButton(button_frame, text='L', width=30, height=30, command=load).pack(anchor='center', side='bottom', padx=20, pady=10)
 
     apply_gain_and_sum([0], [0])

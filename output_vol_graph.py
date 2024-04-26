@@ -54,4 +54,4 @@ def start_gui(main_app, audio_stream_handler):
     canvas_widget = canvas.get_tk_widget()
     canvas_widget.pack(fill='both', expand=True)
 
-    main_app.ani = FuncAnimation(fig, update_plot, interval=window/30, blit=False, cache_frame_data=False)
+    main_app.ani = FuncAnimation(fig, update_plot, interval=10, blit=False, cache_frame_data=False)
