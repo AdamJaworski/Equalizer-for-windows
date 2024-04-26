@@ -1,6 +1,5 @@
 import customtkinter
 import numpy as np
-import cmath
 from numpy.fft import rfft, irfft
 
 

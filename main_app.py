@@ -5,6 +5,7 @@ import output_vol_graph
 import equalizer
 import phase_angle
 from audio_stream_handler import AudioStreamHandler
+from pathlib import Path
 
 
 def __on_exit():
@@ -13,6 +14,13 @@ def __on_exit():
 
 
 def __on_start():
+    root_path  = Path(rf'./data').resolve()
+    saved      = root_path / "saved"
+    default    = root_path / "default"
+    root_path.mkdir(exist_ok=True, parents=True)
+    saved.mkdir(exist_ok=True, parents=True)
+    default.mkdir(exist_ok=True, parents=True)
+
     audio_stream_handler = AudioStreamHandler()
     output_vol_graph.start_gui(app, audio_stream_handler)
     volume.start_gui(app, audio_stream_handler)
